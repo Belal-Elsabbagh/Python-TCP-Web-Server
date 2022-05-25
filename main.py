@@ -13,10 +13,12 @@ def send_file(conn_socket: socket, data_str: str) -> None:
     connectionSocket.send("\r\n".encode('UTF-8'))
 
 
+TCP_PORT: int = 6789
+BUFFER_SIZE: int = 4096
+HOST_IP: str = "127.0.0.1"
+
 serverSocket = socket(AF_INET, SOCK_STREAM)
-TCP_PORT = 6789
-BUFFER_SIZE = 4096
-serverSocket.bind(("127.0.0.1", TCP_PORT))
+serverSocket.bind((HOST_IP, TCP_PORT))
 serverSocket.listen(4)
 print('Server initialized\n')
 
