@@ -1,4 +1,19 @@
+import string
 from socket import *
+
+
+def send_file(conn_socket: socket, data_str: string) -> None:
+    """
+    Sends a string through the connection socket
+    :rtype: None
+    :param conn_socket: The open connection socket
+    :param data_str: The string 
+    """
+    conn_socket.send('HTTP/1.1 200 OK\r\n\r\n'.encode('utf-8'))
+    for i in range(0, len(data_str)):
+        conn_socket.send(data_str[i].encode('utf-8'))
+    connectionSocket.send("\r\n".encode('utf-8'))
+
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
 TCP_PORT = 6789
@@ -13,17 +28,12 @@ while True:
     try:
         message = connectionSocket.recv(BUFFER_SIZE)
         filename = message.split()[1]
-        f = open(filename[1:], 'r')
-        outputData = f.read()
-        connectionSocket.send('HTTP/1.1 200 OK\r\n\r\n'.encode('utf-8'))
-        for i in range(0, len(outputData)):
-            connectionSocket.send(outputData[i].encode('utf-8'))
-        connectionSocket.send("\r\n".encode('utf-8'))
+        requestedFile = open(filename[1:], 'r')
+        requestedFileData = requestedFile.read()
+        send_file(connectionSocket, requestedFileData)
         print("File sent.\n")
     except IOError:
-        fail = '''<html> <head> <title> 404 </title> </head> <body><h1>404 NOT FOUND</h1> <h3> Nothing was found! </h3> 
-        </body></html> '''
-        connectionSocket.send('HTTP/1.1 200 OK\r\n\r\n'.encode('utf-8'))
-        for q in fail:
-            connectionSocket.send(q.encode('utf-8'))
+        errFile = open('err_page.html', 'r')
+        errFileData = errFile.read()
+        send_file(connectionSocket, errFileData)
         connectionSocket.close()
