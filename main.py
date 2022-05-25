@@ -1,39 +1,29 @@
-# import socket module
 from socket import *
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
-# Prepare a sever socket
-# Fill in start
-TCP_PORT = 8000
-BUFFER_SIZE = 1024
-serverSocket.bind(('', TCP_PORT))
-serverSocket.listen(1)
+TCP_PORT = 6789
+BUFFER_SIZE = 4096
+serverSocket.bind(("127.0.0.1", TCP_PORT))
+serverSocket.listen(4)
 print('Server initialized')
-# Fill in end
 while True:
-    # Establish the connection
     print('Ready to serve...')
     connectionSocket, addr = serverSocket.accept()
     print('Connection address:', addr)
     try:
         message = connectionSocket.recv(BUFFER_SIZE)
         filename = message.split()[1]
-        f = open(filename[1:])
+        f = open(filename[1:], 'r')
         outputData = f.read()
-        # Send one HTTP header line into socket
-        connectionSocket.send('HTTP/1.0 200 OK\r\n')
-        # Send the content of the requested file to the client
+        connectionSocket.send('HTTP/1.1 200 OK\r\n\r\n'.encode('utf-8'))
         for i in range(0, len(outputData)):
-            connectionSocket.send(outputData[i])
-        connectionSocket.close()
+            connectionSocket.send(outputData[i].encode('utf-8'))
+        connectionSocket.send("\r\n".encode('utf-8'))
+        print("File sent.\n")
     except IOError:
-        # Send response message for file not found
-        fail = '''<html> <head> <title> 404 </title> </head> <body><h1>404 Bruh</h1> <h3> Nothing was found! </h3> 
+        fail = '''<html> <head> <title> 404 </title> </head> <body><h1>404 NOT FOUND</h1> <h3> Nothing was found! </h3> 
         </body></html> '''
-
-        connectionSocket.send('HTTP/1.0 200 OK\r\n')
-
+        connectionSocket.send('HTTP/1.1 200 OK\r\n\r\n'.encode('utf-8'))
         for q in fail:
-            connectionSocket.send(q)
-    # Close client socket
-    serverSocket.close()
+            connectionSocket.send(q.encode('utf-8'))
+        connectionSocket.close()
