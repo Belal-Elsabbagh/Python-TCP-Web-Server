@@ -28,11 +28,10 @@ while True:
     connectionSocket, addr = serverSocket.accept()
     print('Connection address:', addr)
     try:
-        message = connectionSocket.recv(BUFFER_SIZE)
-        print("HTTP Request: " + message.decode('utf-8'))
-        filename = message.split()[1]
-
-        requestedFile = open(filename[1:], 'r')
+        http_request = connectionSocket.recv(BUFFER_SIZE)
+        print("HTTP Request: " + http_request.decode('utf-8'))
+        filename = http_request.split()[1][1:]  # split request, get file name, get string starting from index 1.
+        requestedFile = open(filename, 'r')
         requestedFileData = requestedFile.read()
         send_file(connectionSocket, 'HTTP/1.1 200 OK\r\n\r\n', requestedFileData)
 
@@ -41,7 +40,7 @@ while True:
         errFile = open('err_page.html', 'r')
         errFileData = errFile.read()
         send_file(connectionSocket, 'HTTP/1.1 404 NOT FOUND\r\n\r\n', errFileData)
-
         connectionSocket.close()
 
+# noinspection PyUnreachableCode
 serverSocket.close()
