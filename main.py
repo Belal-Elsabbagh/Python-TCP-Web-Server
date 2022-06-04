@@ -14,6 +14,16 @@ def send_file(conn_socket: socket, http_response: str, data_str: str) -> None:
     connectionSocket.send("\r\n".encode('UTF-8'))
 
 
+def get_filename_from_http_request(request: str) -> str:
+    """
+    Gets the requested file's name from the http request by splitting the request to multiple strings,
+    getting the second string, and removing the first character.
+    :param request: the http request string
+    :return: the file name requested in the http request.
+    """
+    return request.split()[1][1:]
+
+
 HOST_IP: str = "127.0.0.1"
 TCP_PORT: int = 6789
 BUFFER_SIZE: int = 4096
@@ -28,9 +38,9 @@ while True:
     connectionSocket, addr = serverSocket.accept()
     print('Connection address:', addr)
     try:
-        http_request = connectionSocket.recv(BUFFER_SIZE)
-        print("HTTP Request: " + http_request.decode('utf-8'))
-        filename = http_request.split()[1][1:]  # split request, get file name, get string starting from index 1.
+        http_request = connectionSocket.recv(BUFFER_SIZE).decode('utf-8')
+        print("HTTP Request: " + http_request)
+        filename = get_filename_from_http_request(http_request)
         requestedFile = open(filename, 'r')
         requestedFileData = requestedFile.read()
         send_file(connectionSocket, 'HTTP/1.1 200 OK\r\n\r\n', requestedFileData)
