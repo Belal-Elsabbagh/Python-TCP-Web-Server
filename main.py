@@ -37,10 +37,10 @@ while True:
     print('Ready to serve...')
     connectionSocket, addr = serverSocket.accept()
     print('Connection address:', addr)
+    http_request = connectionSocket.recv(BUFFER_SIZE).decode('utf-8')
+    print("HTTP Request: " + http_request)
+    filename = get_filename_from_http_request(http_request)
     try:
-        http_request = connectionSocket.recv(BUFFER_SIZE).decode('utf-8')
-        print("HTTP Request: " + http_request)
-        filename = get_filename_from_http_request(http_request)
         requestedFile = open(filename, 'r')
         requestedFileData = requestedFile.read()
         send_file(connectionSocket, 'HTTP/1.1 200 OK\r\n\r\n', requestedFileData)
