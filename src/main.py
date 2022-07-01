@@ -49,7 +49,7 @@ def main():
 
             print("*** File sent. ***\n")
         except IOError:
-            err_file = open('err_page.html', 'r')
+            err_file = open('../pages/err_page.html', 'r')
             err_file_data = err_file.read()
             send_file(connection_socket, 'HTTP/1.1 404 NOT FOUND\r\n\r\n', err_file_data)
             connection_socket.close()
